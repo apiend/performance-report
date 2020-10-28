@@ -1,54 +1,43 @@
-### [**中文**](README.md) | [**英文**](EN-README.md)
+###  web-report 是一款浏览器端页面性能，ajax, fetch ,错误信息，资源性能上报SDK，资源小巧，性能强悍
 
-###  performance-report 是一款浏览器端页面性能，ajax, fetch ,错误信息，资源性能上报SDK，资源小巧，性能强悍
+### 上报sdk有五种
+>  * 一 ：所有类型通用的上报SDK 即：web-report-default.js
+>  * 二 ：针对于使用Jquery ajax的上报SDK 即：web-report-jquery.js 
+>  * 三 ：针对于使用Axios ajax的上报SDK 即：web-report-axios.js
+>  * 四 ：针对于使用Fetch ajax的上报SDK 即：web-report-fetch.js
+>  * 五 ：针对于业务代码手动触发的上报SDK 即：web-report-none.js
 
-### 上报sdk有三种
->  * 一 ：所有类型通用的上报SDK 即：performance-report-default.js
->  * 二 ：针对于使用Jquery ajax的上报SDK 即：performance-report-jquery.js (jquery请使用3.0以上版本)
->  * 一 ：针对于使用Axios ajax的上报SDK 即：performance-report-axios.js
+* 通用版本适合所有上报情况
+* 至于四种sdk的选择可酌情选择。通常来说专库专用会更好，因此使用jquery的推荐第二种，使用fetch的推荐第三种,使用Axios的推荐第三种，其他情况使用通用版本
 
-* 至于三种sdk的选择可酌情选择。通常来说转库专用会更好，因此使用jquery的推荐第二种，使用Axios的推荐第三种，其他所有的使用通用版本第一种
-* 当然通用版本适合所有上报，使用jquery和axios的都能够很好的上报
+* web-report-sdk 只做页面性，错误信息，资源信息，ajax信息等上报，让你不用关心浏览器上报部分，是一个比较完整和健全的数据上报插件。
+* 在此基础上你可以开发任何自己需要的性能上报系统。 
 
-
-* performance-report SDK只做页面性，错误信息，资源信息，ajax信息等上报，让你不用关心浏览器上报部分，是一个比较完整和健全的数据上报插件。
-* 在此基础上你可以开发任何自己需要的性能上报系统。
-
-### performance-report SDK主要上报一下性能信息
+### web-report SDK主要上报以下性能信息
+>  * url            上报页面地址
 >  * preUrl         来访上一页面URL
 >  * performance    页面性能数据详情，字段含义详情请参考后面内容
 >  * errorList      页面错误信息详情，包含js,img,ajax,fetch等所有错误信息，字段含义详情请参考后面内容
 >  * resoruceList   页面性能数据详情，当前页面所有资源性能详情信息，字段含义详情请参考后面内容
->  * markPage       每次请求都会change，可以用来标识页面，或者关联表字段查询
->  * markUser       从用户进入网站开始标识，直到用户离开销毁，可以用来做UV统计
+>  * markUv         统计uv标识
+>  * markUser       从用户进入网站开始标识，直到用户离开销毁，可以用来做用户漏斗分析
 >  * time           当前上报时间
 >  * screenwidth    屏幕宽度
 >  * screenheight   屏幕高度
-
-### 以下我根据此SDK开发的一款完整版本前端性能监控系统
-https://github.com/wangweianger/egg-mongoose-performance-system
-
-### SDK npm 地址，npm版本默认default版本，即通用版本，若需要其他版本，请本地引入
-https://www.npmjs.com/package/performance-report
-
-### 注意事项
-* jquery 和 axios 版本需要放在jquery 或 axios之后，不然ajax错误性信息无法采集
-* 通用版本不受影响，可以在其之前之后引入都OK
-
-### 单页面程序上报处理
-* 单页面应用程序主要资源只会加载一次，因此插件只统计第一次进入页面的资源性能详情，路由切换时是不需要再上报单页面已经加载的资源性能信息，因此此SDK鉴于此考虑，路由切换时只上报按需加载的资源信息和请求的页面ajax信息，触发条件为此页面是否有ajax，有则触发，无则不触发。
+>  * isFristIn      是否是某次会话的第一次进入
+>  * type           上报类型  1:页面级性能上报  2:页面ajax性能上报  3：页面内错误信息上报
 
 ### 浏览器页面直接引用资源方式：
->  * 1、下载 dist/performance-report-default.min.js 到本地
+>  * 1、下载 dist/web-report-default.min.js 到本地
 >  * 2、使用script标签引入到html的头部（备注：放到所有js资源之前）
->  * 3、使用performance函数进行数据的监听上报
+>  * 3、使用performance函数进行数据的监听上报 
 
 ```html
 <html>
 <head>
   <meta charset="UTF-8">
   <title>performance test</title>
-  <script src="../dist/performance-report-default.min.js"></script>
+  <script src="../dist/web-report-default.min.js"></script>
   <script>
     Performance({
         domain:'http://some.com/api', //Your API address
@@ -57,16 +46,31 @@ https://www.npmjs.com/package/performance-report
 </head>
 ```
 
+### npm引入方式
+```js
+npm install web-report --save
+
+import {
+  Performance,
+  axiosReport,
+  defaultReport,
+  fetchReport,
+  jqueryReport,
+  noneReport
+} from 'web-report'
+
+```
+
 ### webpack 使用
 ```js
-npm install performance-report --save-dev
-或者下载SDK到本地进行引入
+npm install web-report --save
 ```
+
 ```js
 //New performance.js file
 //The contents are as follows
 
-import Performance from 'performance-report'
+import { Performance } from 'web-report'
 
 Performance({ 
   domain:'http://some.com/api' 
@@ -90,8 +94,44 @@ new htmlWebpackPlugin({
 
 ```
 
-### 参数说明
+### none JDK使用方法
+*  none JDK在程序中使用 window.ReportData();来触发上报
+*  在多页面中可加载插件后调用 window.ReportData() 方法直接上报。
+*  在vue中可如此使用：
+```js
+router.afterEach((to, from, next) => {
+  if(from.name){
+    try{ window.ReportData(); }catch(e){}
+  }else{
+    addEventListener("load",function(){
+          try{ window.ReportData(); }catch(e){}
+      },false);
+  }
+})
+```
+*  在react中也可以使用 withRouter 对路由跳转后进行统一上报。
 
+
+### 以下我根据此SDK开发的一款完整版本前端性能监控系统
+https://github.com/wangweianger/zanePerfor
+
+### SDK npm 地址
+https://www.npmjs.com/package/web-report
+
+### 注意事项
+* jquery和axios JDK需要放在jquery 或 axios之后，不然ajax错误性信息无法采集
+
+### 单页面程序上报处理
+* 增加每次会话的第一次进入标识：isFristIn，客观的统计用户第一次进入页面性能数据
+* 单页面应用程序路由切换时根据页面是否有ajax请求进行性能的上报
+* 也可以自行使用none类型jdk配合路由钩子进行上报
+
+### 上报参数type值说明（重要）
+* type = 1:  页面级别性能数据上报，即页面加载|路由切换时页面性能数据的上报
+* type = 2:  页面已加载完毕，当进行某些操作请求了ajax信息时，对ajax性能数据的上报（如果ajax报错则上报错误信息）
+* type = 3:  页面已加载完毕，当进行某些操作报错时，对错误信息的上报
+
+### 参数说明
 >  * 同时传入 domain和传入的function ，function优先级更高，也就是说function会执行
 >  * domain     ：上报api接口
 >  * outtime    ：上报延迟时间，保证异步数据的加载 （默认：300ms）
@@ -104,7 +144,7 @@ new htmlWebpackPlugin({
 >  * fn         ：自定义上报函数，上报方式可以用ajax可以用fetch (非必填：默认使用fetch,如果使用ajax则必须参数 report:'report-data'，如果是fetch则必须参数：type:'report-data')
 
 * 案例
-```
+```js
 1、最简单最常用的上报
 Performance({
   domain:'http://some.com/api'  //你的api地址
@@ -122,8 +162,8 @@ Performance({
 Performance({},data=>{
   fetch('http://some.com/api',{
     type:'POST',
+    report:'report-data',
     headers: {'Content-Type': 'application/json'},
-    type:'report-data',
     body:JSON.stringify(data)
   }).then((data)=>{})
 })
@@ -132,6 +172,7 @@ Performance({},data=>{
 Performance({},data=>{
   $.ajax({
     type:'POST',
+    report:'report-data',
     contentType: 'application/json',
     data:{
       data:data
@@ -190,7 +231,7 @@ If you use the Vue framework, you can do it like this.
 * 1、Introduce Performance
 * 2、Copy the following code
 ```js
-import Performance from 'performance-report'
+import { Performance } from 'web-report'
 
 Vue.config.errorHandler = function (err, vm, info) {
     let { message, stack } = err;
@@ -223,7 +264,7 @@ https://reactjs.org/blog/2017/07/26/error-handling-in-react-16.html
 react16之后提供Error Handling处理报错机制，父组件新增componentDidCatch钩子函数，父组件只能监听子组件的异常信息
 ```js
 //Top reference
-import Performance from 'performance-report'
+import { Performance } from 'web-report'
 
 //Parent component listens for subcomponent error information
 componentDidCatch(error, info) {
@@ -251,7 +292,7 @@ componentDidCatch(error, info) {
 
 ## Runing
 ```js
-git clone https://github.com/wangweianger/performance-report.git
+git clone https://github.com/wangweianger/web-report-sdk.git
 npm install
 
 //Development
@@ -270,8 +311,11 @@ http://localhost:8080/test/
 
 | parameter name | describe | explain |
 | --- | --- | --- |
-| markPage | 当前页面标识 |  |
+| url | 上报页面地址 |  |
+| markUv | 统计uv标识 |  |
 | markUser | 用户标识  | 可用来做UV统计，和用户行为漏斗分析 |
+| isFristIn | 是否是每次会话的第一次渲染 | 可以用来做首屏渲染性能统计分类 |
+| type | 上报类型 | 1:页面级性能上报  2:页面ajax性能上报  3：页面内错误信息上报 |
 | screenwidth | 屏幕宽度  |  |
 | screenheight | 屏幕高度  |  |
 | preUrl | 上一页面  |  |
@@ -313,8 +357,11 @@ http://localhost:8080/test/
   "time": 1524136760783, 
   "preUrl": "", 
   "appId":"123456789",
-  "markPage": "hzYyTkk2TzJ2M3dE1aR1539930145705"
-  "markUser": "FtJ7BykWAPc3SyXQayd1539917250089"
+  "type": 1,
+  "isFristIn": true,
+  "markUv": "hzYyTkk2TzJ2M3dE1aR1539930145705",
+  "markUser": "FtJ7BykWAPc3SyXQayd1539917250089",
+  "url":"http://blog.seosiwei.com",
   "errorList": [
     {
       "t": 1524136759597, 
@@ -375,7 +422,7 @@ http://localhost:8080/test/
   }, 
   "resourceList": [
     {
-      "name": "http://localhost:8080/dist/performance-report.js", 
+      "name": "http://localhost:8080/dist/web-report.js", 
       "method": "GET", 
       "type": "script", 
       "duration": "73.70", 
